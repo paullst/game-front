@@ -1,28 +1,33 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { CountryService } from './service/country/country.service';
-import { GameComponent } from './game/game.component';
+import { GameComponent } from './pages/game/game.component';
 
-// Bootstrap
 import { NgbModule, NgbAlertModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CreateComponent } from './create/create.component';
-import { GameService } from './service/game/game.service';
-import { MoveService } from './service/move/move.service';
-
-
+import { CreateComponent } from './pages/create/create.component';
+import { GameService } from './services/game/game.service';
+import { MoveService } from './services/move/move.service';
+import { CountryRefResolver } from './resolvers/country-ref.resolver';
+import { InitialStateResolver } from './resolvers/initial-state.resolver';
+import { LoaderService } from './services/loader/loader.service';
+import { AbstractComponent } from './pages/abstract/abstract.component';
+import { LoaderInterceptorService } from './interceptors/loader/loader-interceptor.service';
+import { NotificationService } from './services/notification/notification.service';
+import { NotificationComponent } from './components/notification/notification.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     GameComponent,
-    CreateComponent
+    CreateComponent,
+    AbstractComponent,
+    NotificationComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +39,19 @@ import { MoveService } from './service/move/move.service';
     NgbAlertModule,
     NgbModalModule
   ],
-  providers: [CountryService, GameService, MoveService],
+  providers: [
+    GameService,
+    MoveService,
+    CountryRefResolver,
+    InitialStateResolver,
+    LoaderService,
+    NotificationService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoaderInterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

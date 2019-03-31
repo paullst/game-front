@@ -1,20 +1,14 @@
-import { Component, NgZone, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef } from "@angular/core";
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-
-import * as am4maps from "@amcharts/amcharts4/maps";
 import europe from "@amcharts/amcharts4-geodata/worldLow";
-import { Country } from '@app/model/country.model';
-import { CountryService } from '@app/service/country/country.service';
+import * as am4core from "@amcharts/amcharts4/core";
+import * as am4maps from "@amcharts/amcharts4/maps";
+import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from '@angular/router';
-import { switchMap, tap } from 'rxjs/operators';
-import { State } from '@app/model/state.model';
-import { Move } from '@app/model/move.model';
-import { move } from '@amcharts/amcharts4/.internal/core/utils/Array';
-import { GameService } from '@app/service/game/game.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { MoveService } from '@app/service/move/move.service';
+import { Country } from '@models/country.model';
+import { Move } from '@models/move.model';
+import { State } from '@models/state.model';
+import { MoveService } from '@services/move/move.service';
+
 
 am4core.useTheme(am4themes_animated);
 
@@ -49,38 +43,25 @@ export class GameComponent implements OnInit, OnDestroy {
   pop2: number = null;
 
   constructor(
-    private zone: NgZone,
-    private countryService: CountryService,
     private route: ActivatedRoute,
-    private gameService: GameService,
-    private modalService: NgbModal,
     private moveService: MoveService
   ) {
   }
 
   ngOnInit() {
 
-    // Fetch country ref
-    this.countryService.getCountryRef().subscribe(
-      ref => this.ref = ref,
-      err => console.log(err)) // TODO: error handling
+    // Get country ref
+    this.ref = this.route.snapshot.data['ref'];
 
-    // Fetch last state
-    this.route.url.pipe(
-      switchMap(url => this.countryService.getLastStateByGameId(url[0].path)),
-    ).subscribe(
-      state => {
-        this.handleState(state);
-        this.pop1 = this.countTotalPop(state.game.player1);
-        this.pop2 = this.countTotalPop(state.game.player2);
-      },
-      err => console.log(err) // TODO: error handling
-    );
+    // Get initial state
+    const state: State = this.route.snapshot.data['state']
+    this.state = state;
+    this.handleState(state);
 
   }
 
   /**
-   * Build map
+   * Make map state
    * @param state 
    */
   makeMapState(state: State): Country[] {
@@ -97,7 +78,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Init Map
+   * Make visual map
    * @param state Init AMChart Map
    */
   makeMap(state: Country[]) {
@@ -155,9 +136,12 @@ export class GameComponent implements OnInit, OnDestroy {
    * Send move to API
    */
   attack() {
-    this.gameService.postMove(this.state.game.id, this.move).subscribe(
+    this.moveService.postMove(this.state.game.id, this.move).subscribe(
       state => {
-       this.handleState(state);
+        this.handleState(state);
+      },
+      err => {
+        console.log(err) // TODO : handle error
       }
     )
   }
@@ -167,7 +151,9 @@ export class GameComponent implements OnInit, OnDestroy {
    * @param player 
    */
   countTotalPop(player: string) {
-    return Object.values(this.state.map).filter(c => c.owner === player).reduce((a, v) => a + v.pop, 0);
+    return Object.values(this.state.map)
+      .filter(c => c.owner === player)
+      .reduce((a, v) => a + v.pop, 0);
   }
 
   /**
@@ -175,17 +161,21 @@ export class GameComponent implements OnInit, OnDestroy {
    * @param state 
    */
   handleState(state: State) {
-    const initMap = this.makeMapState(state);
-    this.makeMap(initMap);
+    const mapState = this.makeMapState(state);
+    this.makeMap(mapState);
     this.state = state;
 
     // Init move
     this.move = new Move(null, null, state.nextPlayer, null);
+
+    // Count pop
+    this.pop1 = this.countTotalPop(state.game.player1);
+    this.pop2 = this.countTotalPop(state.game.player2);
   }
 
   ngOnDestroy() {
-      if (this.map) {
-        this.map.dispose();
-      }
+    if (this.map) {
+      this.map.dispose();
+    }
   }
 }

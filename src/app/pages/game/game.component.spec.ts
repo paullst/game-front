@@ -1,6 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GameComponent } from './game.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from '@app/app-routing.module';
+import { CreateComponent } from '@app/create/create.component';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('GameComponent', () => {
   let component: GameComponent;
@@ -8,7 +13,14 @@ describe('GameComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ GameComponent ]
+      declarations: [ GameComponent, CreateComponent ],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        AppRoutingModule,
+        NgbAlertModule
+      ]
     })
     .compileComponents();
   }));

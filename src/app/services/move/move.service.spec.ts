@@ -16,11 +16,7 @@ describe('MoveService', () => {
   // TODO
   it('#isSelectingFromCountry should return true', () => {
     const service: MoveService = TestBed.get(MoveService);
-
-    const polygon: MapPolygon = new MapPolygon();
-    const state: State = null;
-    const move: Move = null;
-    const ref: Map<string, string[]> = null;
+    
     // expect(service.isSelectingFromCountry())
   });
 

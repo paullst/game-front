@@ -1,10 +1,8 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
+import { State } from '@models/state.model';
 import { environment } from "@env/environment";
-import { HttpParams, HttpClient } from '@angular/common/http';
-import { Move } from '@app/model/move.model';
-import { State } from '@app/model/state.model';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -42,13 +40,18 @@ export class GameService {
   }
 
   /**
-   * Post new move
+ * Get country referential
+ */
+  public getCountryRef(): Observable<Map<string, string[]>> {
+    return this.http.get<Map<string, string[]>>(`${environment.api}/country-ref/`)
+  }
+
+  /**
+   * Get last state by game id
    * @param gameId 
-   * @param move 
-   * @returns new state
    */
-  postMove(gameId: number, move: Move): Observable<State> {
-    return this.http.post<State>(`${this.api}/game/${gameId}/move`, move);
+  public getLastStateByGameId(gameId: string): Observable<State> {
+    return this.http.get<State>(`${environment.api}/game/${gameId}`)
   }
 
 }

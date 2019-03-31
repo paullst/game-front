@@ -1,11 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Move } from '@app/model/move.model';
-
-import * as am4maps from "@amcharts/amcharts4/maps";
 import * as am4core from "@amcharts/amcharts4/core";
+import * as am4maps from "@amcharts/amcharts4/maps";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Move } from '@models/move.model';
+import { environment } from "@env/environment";
+import { State } from '@models/state.model';
+import { Observable } from 'rxjs';
 
-import { State } from '@app/model/state.model';
-import { Country } from '@app/model/country.model';
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,8 @@ import { Country } from '@app/model/country.model';
  * Move Service
  */
 export class MoveService {
+
+  api: string;
 
   move: Move;
   state: State;
@@ -29,7 +33,21 @@ export class MoveService {
   // Target country polygon
   targetCountryPolygon: am4maps.MapPolygon;
 
-  constructor() { }
+  constructor (
+    private http: HttpClient
+  ) {
+    this.api = environment.api;
+  }
+
+  /**
+   * Post new move
+   * @param gameId 
+   * @param move 
+   * @returns new state
+   */
+  postMove(gameId: number, move: Move): Observable<State> {
+    return this.http.post<State>(`${this.api}/game/${gameId}/move`, move);
+  }
 
   /**
    * Handle user click
@@ -74,7 +92,7 @@ export class MoveService {
 
   }
 
-  protected isSelectingFromCountry(): boolean {
+  isSelectingFromCountry(): boolean {
     return this.move.from === null && this.state.map[this.targetCountry].owner === this.move.player && this.state.map[this.targetCountry].pop;
   }
 

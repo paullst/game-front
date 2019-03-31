@@ -1,0 +1,29 @@
+<div class="main">
+
+  <div style="display: block">
+
+    <!-- Title-->
+    <h1 style="margin-bottom: 25px">Create new game</h1>
+
+    <!-- Game creation form-->
+    <form [formGroup]="newGameForm" (submit)="onSubmit()">
+      <div class="row">
+        <div class="col-4">
+          <input formControlName="player1" class="form-control form-control-lg" type="text" placeholder="Player 1" />
+        </div>
+        <div class="col-4">
+          <input formControlName="player2" class="form-control form-control-lg" type="text" placeholder="Player 2" />
+        </div>
+        <div class="col-4">
+
+          <button [disabled]="!newGameForm.valid || loading" type="submit" class="btn btn-outline-primary btn-lg">
+            Create game
+          </button>
+
+        </div>
+      </div>
+    </form>
+
+  </div>
+
+</div>

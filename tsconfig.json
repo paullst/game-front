@@ -21,7 +21,12 @@
     "baseUrl": "src",
     "paths": {
       "@app/*": ["app/*"],
-      "@env/*": ["environments/*"]
+      "@env/*": ["environments/*"],
+      "@services/*": ["app/services/*"],
+      "@pages/*": ["app/pages/*"],
+      "@interceptors/*": ["app/interceptors/*"],
+      "@models/*": ["app/models/*"],
+      "@components/*": ["app/components/*"],
     }
   }
 }

@@ -1,3 +1,15 @@
 <div class="container">
     <router-outlet></router-outlet>
 </div>
+
+<!-- Loader -->
+<div [class.hidden]="!loading">
+    <div class="loader-overlay">
+        <div *ngIf="loading" class="loader"></div>
+    </div>
+</div>
+
+<!-- Notif -->
+<div *ngIf="notif" class="notif">
+    <ngb-alert [type]="notif.type" [dismissible]="false">{{ notif.message }}</ngb-alert>
+</div>
